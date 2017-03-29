@@ -4,8 +4,7 @@
 
 int main()
 {
-	for (int ii = 0; ii < 100; ii++)
-	{
+
 		AVLTree<int> tree;
 
 		srand(time(NULL));
@@ -34,7 +33,16 @@ int main()
 		}
 		printf("\n\n");
 
-	}
+        for (int i = 0; i < data.size(); i++)
+        {
+            tree.erase(data[i]);
+        }
+
+
+
+
+        printf("size after removval = %d\n", tree.size());
+
 
 	return 0;
 }
