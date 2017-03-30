@@ -25,7 +25,7 @@ public:
 	}
 	void erase(const T& t)
 	{
-        //to do
+        _root = erase(t, _root);
 	}
 
 	vector<T> getData()
@@ -70,6 +70,67 @@ private:
 		}
 	}
 
+    Node<T>* erase(const T& t, Node<T>* node)
+    {
+        if (node == nullptr) { return node; }
+        if (t < node->data)
+        {
+			node->left = erase(t, node->left);
+			int leftNodeLevel = getLevel(node->left);
+			int rightNodeLevel = getLevel(node->right);
+			if(std::abs(leftNodeLevel - rightNodeLevel) > 1)
+			{
+				return balance(node);
+			}
+			else
+			{
+				node->level = adjustLevel(node);
+			}
+			return node;
+        }
+        else if (t > node->data)
+        {
+			node->right = erase(t, node->right);
+			int leftNodeLevel = getLevel(node->left);
+			int rightNodeLevel = getLevel(node->right);
+			if(std::abs(leftNodeLevel - rightNodeLevel) > 1)
+			{
+				return balance(node);
+			}
+			else
+			{
+				node->level = adjustLevel(node);
+			}
+			return node;
+        }
+        else // t == node->data
+        {
+            _size--;
+			if(node->left == nullptr && node->right == nullptr)
+			{
+				delete node;
+				return nullptr;
+			}
+			else if(node->left != nullptr && node->right == nullptr)
+			{
+				Node<T>* temp = node->left;
+				delete node;
+				return temp;
+			}
+			else if(node->left == nullptr && node->right != nullptr)
+			{
+				Node<T>* temp = node->right;
+				delete node;
+				return temp;
+			}
+			else // t->left != nullptr && t->right != nullptr
+			{
+				Node<T>* nextNode = findNextNode(node);
+				return erase(nextNode->data, node);
+			}
+        }
+    }
+
 	Node<T>* insert(const T& t, Node<T>* node)
 	{
 		if (node == nullptr)
@@ -99,7 +160,7 @@ private:
 			}
 			else
 			{
-				node->level = std::max(leftNodeLevel, rightNodeLevel) + 1;
+				node->level = adjustLevel(node);
 				return node;
 			}
 		}
@@ -209,6 +270,16 @@ private:
 		inorder(vec, node->left);
 		vec.push_back(node->data);
 		inorder(vec, node->right);
+	}
+	
+	Node<T>* findNextNode(Node<T>* node)
+	{
+		Node<T>* next = node->right;
+		while(next->left)
+		{
+			next = next->left;
+		}
+		return next;
 	}
 
 	Node<T>* _root = nullptr;
